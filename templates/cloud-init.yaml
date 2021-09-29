@@ -1,0 +1,46 @@
+#cloud-config
+
+package_update: true
+
+packages:
+  - docker.io
+  - docker-compose
+  - unzip
+  - jq
+
+groups:
+  - docker
+
+users:
+  - default
+  - name: jitsi
+    primary-group: docker
+    groups: users
+
+write_files:
+  - path: /run/cloud-init/run.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/bash
+
+      cd $HOME
+      version="$(curl -s https://api.github.com/repos/jitsi/docker-jitsi-meet/releases/latest | jq -r '.tag_name')"
+      wget https://github.com/jitsi/docker-jitsi-meet/archive/refs/tags/$${version}.zip
+      unzip $${version}.zip
+      cd docker-jitsi-meet-$${version}
+      cp env.example .env
+      ./gen-passwords.sh
+      echo "ENABLE_XMPP_WEBSOCKET=0" >> .env
+      echo "ENABLE_HTTP_REDIRECT=1" >> .env 
+      echo "ENABLE_HSTS=1" >> .env
+      echo "PUBLIC_URL=https://${domain}" >> .env
+      echo "ENABLE_LETSENCRYPT=1" >> .env
+      echo "LETSENCRYPT_DOMAIN=${domain}" >> .env
+      echo "LETSENCRYPT_EMAIL=${email}" >> .env
+      echo "LETSENCRYPT_USE_STAGING=${use_le_staging}" >> .env
+      sed -i "s/HTTP_PORT=8000/HTTP_PORT=80/" .env
+      sed -i "s/HTTPS_PORT=8443/HTTPS_PORT=443/" .env
+      docker-compose up -d
+
+runcmd:
+  - su jitsi -c /run/cloud-init/run.sh
