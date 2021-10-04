@@ -1,60 +1,78 @@
-# Gandi-Jitsi terraform module
+# terraform-gandi-jitsi
 
-## Prerequisites
+Terraform module that installs a [Jitsi](https://meet.jit.si/) instance on a newly created
+Openstack virtual machine on GandiCloud VPS infrastructure.
+The Jitsi instance will use Let's Encrypt to generate a certificate.
 
-This module uses:
+This module uses the [openstack](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs) and [gandi](https://registry.terraform.io/providers/psychopenguin/gandi/latest/docs) providers. Please refer to their respective documentation for usage and configuration.
 
-- Terraform ([install Terraform][1])
-- A domain name registered with Gandi ([gandi.net](https://www.gandi.net/))
-- A Gandi V5 API Key
-- A GandiCloud VPS instance (it will be automatically created by Terraform)
+The Openstack provider will create the SSH key and the virtual machine using Ubuntu 20.04 as the base system image and initialize it with the SSH key and a Cloud-Init file that will install Jitsi onto the virtual machine.
 
-In order for this Terraform recipe to succeed, it must be possible to create a GandiCloud VPS instance and to manage a domain name registered with Gandi.
+The Gandi provider will create LiveDNS records that will point to the virtual machine IP addresses.
 
-Then use:
+## Usage
+```hcl
+# Define required providers
+terraform {
+  required_version = ">= 1.0"
+}
 
-```bash
-terraform init
+provider "openstack" {
+  auth_url = "https://keystone.sd6.api.gandi.net:5000/v3"
+  region = "FR-SD6"
+}
+
+provider "gandi" {}
+
+# Use gandi/jitsi module
+module "gandi-jitsi" {
+    source = "gandi/jitsi"
+    server_name = "gandi-jitsi"
+    keypair_name = "module-jitsi"
+    letsencrypt_email = "email@example.com"
+    dns_subdomain = "jitsi"
+    dns_zone = "example.com"
+}
+
+output "ssh" {
+  value = module.gandi-jitsi.ssh_cmd
+}
+
+output "url" {
+  value = module.gandi-jitsi.https_address
+}
 ```
 
-to initiate the terraform workspace and install the modules and providers used here.
+## Inputs
 
-## How to use it
-
-This terraform infrastructure description will deploy a Jitsi instance on a V-R4 GandiCloud VPS server using the Jitsi docker release.
-In order for this Terraform manifest to work properly the following environment variables must be exported:
-
- - TF_VAR_letsencrypt_email: the email to provide to Let's Encrypt for notifications
- - TF_VAR_dns_zone: the domain name (eg: example.com)
- - TF_VAR_dns_subdomain: the subdomain (eg: visio)
- - TF_VAR_api_key: a Gandi V5 API Key
- - TF_VAR_sharing_id: the sharing ID of an organization that can manage the DNS zone of the domain name in order to create the A and AAAA records.
-
-If any of those variable is missing terraform will ask for a value.
-
-Optional environment variables:
-
- - TF_VAR_keypair_name: the keypair name in openstack to initialize the server with. If no keypair is provided, there will be no way to connect to the server via SSH. Default is set to null, so no keypair will be provided during the server creation process.
- - TF_VAR_letsencrypt_staging: whether or not to use Let's Encrypt staging environment. (1 uses staging, 0 uses production). Only the production environment will generate a valid SSL certificate. Default is set to 0 to use the production environment.
-
-Another part of the setup is to provide the Openstack credentials needed to create the virtual machine, which can be obtained via an openrc file or using an Openstack authentication token.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="server_name"></a> [server_name](#server\_name) | The name of the virtual machine used by Openstack. | `string` | "jitsi" | no |
+| <a name="keypair_name"></a> [keypair_name](#keypair\_name) | The name of the ssh keypair to be created by Openstack. It must not exist. | `string` | "jitsi-keypair" | no |
+| <a name="letsencrypt_email"></a> [letsencrypt_email](#letsencrypt\_email) | The email that Let's Encrypt will use for expiration notifications. | `string` | n/a | yes |
+| <a name="letsencrypt_staging"></a> [letsencrypt_staging](#letsencrypt\_staging) | "0" Means not to use Let's Encrypt staging platform. "1" Means to use it. Useful for testing purposes as there is a rate limit on the production platform. | `string` | "0" | no |
+| <a name="dns_subdomain"></a> [dns_subdomain](#dns\_subdomain) | The subdomain used with the DNS zone by the gandi provider. This will create an A and and AAAA record that points to the virtual machine hosting the Jitsi instance. | `string` | n/a | yes |
+| <a name="dns_zone"></a> [dns_zone](#dns\_zone) | The DNS zone used by the gandi provider. | `string` | n/a | yes |
 
 
-To create a virtual machine and install Jitsi use:
+## Outputs
 
-```bash
-terraform apply
-```
+| Name | Description |
+|------|-------------|
+| <a name="ssh_cmd"></a> [ssh_cmd](#ssh\_cmd) | The ssh command to use to connect to the virtual machine |
+| <a name="IP_v4"></a> [IP_v4](#IP\_v4) | The virtual machine's IP v4 |
+| <a name="IP_v6"></a> [IP_v6](#IP\_v6) | The virtual machine's IP v6 |
+| <a name="https_address"></a> [https_address](#https\_address) | The URL of the Jitsi using https |
 
-and follow the instructions.
 
-# Testing
+## Requirements
 
-It is possible to use the staging servers from Let's Encrypt in order to test the deployment.
-In order to do this, simply export the following variable:
+| Name | Version |
+|------|---------|
+| <a name="terraform"></a> [terraform](#terraform) | ~> 1.0 |
+| <a name="openstack"></a> [openstack](#openstack) | ~> 1.35.0 |
+| <a name="gandi"></a> [gandi](#gandi) | 2.0.0-rc3 |
 
-```
-export TF_VAR_letsencrypt_staging=1
-```
 
-[1]: https://learn.hashicorp.com/tutorials/terraform/install-cli
+
+
