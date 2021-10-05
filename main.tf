@@ -12,51 +12,6 @@ required_version = ">= 1.0"
   }
 }
 
-provider "openstack" {
-  auth_url = "https://keystone.sd6.api.gandi.net:5000/v3"
-  region = "FR-SD6"
-}
-
-provider "gandi" {
-  key = var.api_key
-  sharing_id = var.sharing_id
-}
-
-variable "api_key" {
-  type = string
-}
-
-variable "sharing_id" {
-  type = string
-}
-
-variable "dns_zone" {
-  type = string
-}
-
-variable "dns_subdomain" {
-  type = string
-}
-
-variable "letsencrypt_email" {
-  type = string
-}
-
-variable "letsencrypt_staging" {
-  type = string
-  default = "0"
-}
-
-variable "server_name" {
-  type = string
-  default = "jitsi"
-}
-
-variable "keypair_name" {
-  type = string
-  default = "jitsi-keypair"
-}
-
 data "template_file" "user_data" {
   template = "${file("${path.module}/templates/cloud-init.yaml")}"
 
@@ -84,6 +39,7 @@ resource "openstack_compute_instance_v2" "jitsi" {
   user_data = "${data.template_file.user_data.rendered}"
 
   block_device {
+    # Ubuntu 20.04
     uuid = "47edd0a0-23ce-4ce5-9168-36de68990d1b"
     source_type           = "image"
     volume_size           = 25
@@ -113,20 +69,4 @@ resource "gandi_livedns_record" "jitsi_dns_v6" {
   type = "AAAA"
   ttl = 1800
   values = [trim("${openstack_compute_instance_v2.jitsi.access_ip_v6}", "[]")]
-}
-
-output "SSH_cmd" {
-  value = "To ssh into the server use: ssh -i ${local_file.private-key.filename} ubuntu@${openstack_compute_instance_v2.jitsi.access_ip_v4}"
-}
-
-output "IP_v4" {
-  value = "${openstack_compute_instance_v2.jitsi.access_ip_v4}"
-}
-
-output "IP_v6" {
-  value = trim("${openstack_compute_instance_v2.jitsi.access_ip_v6}", "[]")
-}
-
-output "https_address" {
-  value = "https://${gandi_livedns_record.jitsi_dns_v4.name}.${gandi_livedns_record.jitsi_dns_v4.zone}"
 }
