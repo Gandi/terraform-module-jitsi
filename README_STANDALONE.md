@@ -9,7 +9,7 @@ This module uses:
 - A Gandi V5 API Key
 - A GandiCloud VPS instance (it will be automatically created by Terraform)
 
-In order for this Terraform recipe to succeed, it must be possible to create a GandiCloud VPS instance and to manage a domain name registered with Gandi.
+In order for this Terraform recipe to succeed, it must be possible to create a GandiCloud VPS instance and the v5 API Key must be able to create and manage DNS records on a domain name registered with Gandi.
 
 Then use:
 
@@ -38,6 +38,7 @@ Optional environment variables:
  - TF_VAR_letsencrypt_staging: whether or not to use Let's Encrypt staging environment. (1 uses staging, 0 uses production). Only the production environment will generate a valid SSL certificate. Default is set to 0 to use the production environment.
 
 Another part of the setup is to provide the Openstack credentials needed to create the virtual machine, which can be obtained via an openrc file or using an Openstack authentication token.
+The Openstack provider documentation can be found [here](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs).
 
 
 To create a virtual machine and install Jitsi use:
