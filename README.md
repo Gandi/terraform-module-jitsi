@@ -1,12 +1,12 @@
 # terraform-gandi-jitsi
 
 Terraform module that installs a [Jitsi](https://meet.jit.si/) instance on a newly created
-Openstack virtual machine on GandiCloud VPS infrastructure.
+OpenStack virtual machine on GandiCloud VPS infrastructure.
 The Jitsi instance will use Let's Encrypt to generate a certificate.
 
-This module uses the [openstack](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs) and [gandi](https://registry.terraform.io/providers/psychopenguin/gandi/latest/docs) providers. Please refer to their respective documentation for usage and configuration.
+This module uses the [OpenStack](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs) and [gandi](https://registry.terraform.io/providers/psychopenguin/gandi/latest/docs) providers. Please refer to their respective documentation for usage and configuration.
 
-The Openstack provider will create the SSH key and the virtual machine using Ubuntu 20.04 as the base system image and initialize it with the SSH key and a Cloud-Init file that will install Jitsi onto the virtual machine.
+The OpenStack provider will create the SSH key and the virtual machine using Ubuntu 20.04 as the base system image and initialize it with the SSH key and a Cloud-Init file that will install Jitsi onto the virtual machine.
 
 The Gandi provider will create LiveDNS records that will point to the virtual machine IP addresses.
 
@@ -77,10 +77,10 @@ output "url" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_dns_subdomain"></a> [dns\_subdomain](#input\_dns\_subdomain) | The subdomain used with the DNS zone by the gandi provider. This will be used to create an A and and AAAA record within the DNS zone that points to the virtual machine hosting the Jitsi instance. | `string` | n/a | yes |
 | <a name="input_dns_zone"></a> [dns\_zone](#input\_dns\_zone) | The DNS zone used by the gandi provider. | `string` | n/a | yes |
-| <a name="input_keypair_name"></a> [keypair\_name](#input\_keypair\_name) | The name of the ssh keypair to be created by Openstack. | `string` | `"jitsi-keypair"` | no |
+| <a name="input_keypair_name"></a> [keypair\_name](#input\_keypair\_name) | The name of the ssh keypair to be created by OpenStack. | `string` | `"jitsi-keypair"` | no |
 | <a name="input_letsencrypt_email"></a> [letsencrypt\_email](#input\_letsencrypt\_email) | The email that Let's Encrypt will use for expiration notifications. | `string` | n/a | yes |
 | <a name="input_letsencrypt_staging"></a> [letsencrypt\_staging](#input\_letsencrypt\_staging) | Whether to use the Let's Encrypt staging platform. "0" Means not to use Let's Encrypt staging platform. "1" Means to use it. Useful for testing purposes as there is a rate limit on the production platform. | `string` | `"0"` | no |
-| <a name="input_server_name"></a> [server\_name](#input\_server\_name) | The name of the virtual machine to be created by Openstack. | `string` | `"jitsi"` | no |
+| <a name="input_server_name"></a> [server\_name](#input\_server\_name) | The name of the virtual machine to be created by OpenStack. | `string` | `"jitsi"` | no |
 
 ## Outputs
 
