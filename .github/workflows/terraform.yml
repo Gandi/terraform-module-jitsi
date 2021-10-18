@@ -63,10 +63,10 @@ jobs:
         URL: http://${{ secrets.DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
       with:
         url: "$URL"
-        follow-redirect: no
+        follow-redirect: false
         max-attempts: 15
         retry-delay: 30s
-        retry-all: yes
+        retry-all: true
       timeout-minutes: 10
 
     - name: Terraform Destroy
