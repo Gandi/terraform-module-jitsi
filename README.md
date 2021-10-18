@@ -25,21 +25,21 @@ provider "openstack" {
 provider "gandi" {}
 
 # Use gandi/jitsi module
-module "gandi-jitsi" {
-    source = "gandi/jitsi"
+module "jitsi" {
+    source = "Gandi/jitsi/module"
     server_name = "gandi-jitsi"
     keypair_name = "module-jitsi"
-    letsencrypt_email = "email@example.com"
+    letsencrypt_email = "email@example.invalid"
     dns_subdomain = "jitsi"
-    dns_zone = "example.com"
+    dns_zone = "example.invalid"
 }
 
 output "ssh" {
-  value = module.gandi-jitsi.ssh_cmd
+  value = module.jitsi.ssh_cmd
 }
 
 output "url" {
-  value = module.gandi-jitsi.https_address
+  value = module.jitsi.https_address
 }
 ```
 
