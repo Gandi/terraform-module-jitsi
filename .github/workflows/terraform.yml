@@ -18,8 +18,10 @@ jobs:
     env:
       GANDI_KEY: ${{ secrets.GANDI_API_KEY }}
       OS_USERNAME: ${{ secrets.OS_USERNAME }}
-      OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
+      OS_PROJECT_NAME: ${{ secrets.OS_USERNAME }}
+      OS_PASSWORD: '${{ secrets.OS_PASSWORD }}'
       OS_DOMAIN_NAME: "public"
+      OS_PROJECT_DOMAIN_NAME: "public"
       OS_USER_DOMAIN_NAME: "public"
       TF_VAR_DNS_SUBDOMAIN: ${{ secrets.DNS_SUBDOMAIN }}
       TF_VAR_DNS_ZONE: ${{ secrets.DNS_ZONE }}
@@ -57,16 +59,15 @@ jobs:
       # Health check on the Jitsi instance
     - name: Test Jisti web service
       uses: jtalk/url-health-check-action@v2
-      env:
-        URL: http://${{ secrets.DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
       with:
-        url: "$URL"
-        follow-redirect: no
+        url: http://${{ secrets.DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
+        follow-redirect: false
         max-attempts: 15
         retry-delay: 30s
-        retry-all: yes
+        retry-all: true
       timeout-minutes: 10
 
     - name: Terraform Destroy
+      if: always()  # Run even on previous step failure
       run: terraform -chdir="./tests/staging" destroy -auto-approve
       
