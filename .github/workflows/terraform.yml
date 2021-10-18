@@ -70,5 +70,6 @@ jobs:
       timeout-minutes: 10
 
     - name: Terraform Destroy
+      if: always()  # Run even on previous step failure
       run: terraform -chdir="./tests/staging" destroy -auto-approve
       
