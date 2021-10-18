@@ -19,6 +19,8 @@ jobs:
       GANDI_KEY: ${{ secrets.GANDI_API_KEY }}
       OS_USERNAME: ${{ secrets.OS_USERNAME }}
       OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
+      OS_DOMAIN_NAME: "public"
+      OS_USER_DOMAIN_NAME: "public"
       TF_VAR_DNS_SUBDOMAIN: ${{ secrets.DNS_SUBDOMAIN }}
       TF_VAR_DNS_ZONE: ${{ secrets.DNS_ZONE }}
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
