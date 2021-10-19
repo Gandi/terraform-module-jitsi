@@ -23,7 +23,7 @@ provider "gandi" {}
 module "gandi-jitsi" {
   source              = "../.."
   server_name         = "gandi-jitsi"
-  keypair_name        = "module-jitsi-test"
+  keypair_name        = var.KEYPAIR_NAME
   letsencrypt_email   = "email@example.invalid"
   letsencrypt_staging = "1"
   dns_subdomain       = var.DNS_SUBDOMAIN
@@ -35,5 +35,9 @@ variable "DNS_SUBDOMAIN" {
 }
 
 variable "DNS_ZONE" {
+  type = string
+}
+
+variable "KEYPAIR_NAME" {
   type = string
 }

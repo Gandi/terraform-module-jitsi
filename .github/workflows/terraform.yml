@@ -1,4 +1,4 @@
-name: 'Terraform CI'
+name: 'Jitsi module CI'
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
     
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Jitsi module CI'
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -31,9 +31,16 @@ jobs:
         shell: bash
         
     steps:
+    - name: Generate SSH Keypair name
+      run: echo TF_VAR_KEYPAIR_NAME=module-jitsi-test-$(uuidgen) >> $GITHUB_ENV
+
+    - name: Generate Subdomain name
+      run : echo TF_VAR_DNS_SUBDOMAIN=${TF_VAR_DNS_SUBDOMAIN}-$(uuidgen) >> $GITHUB_ENV
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
+
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
@@ -60,12 +67,12 @@ jobs:
     - name: Test Jisti web service
       uses: jtalk/url-health-check-action@v2
       with:
-        url: http://${{ secrets.DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
+        url: http://${{ env.TF_VAR_DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
         follow-redirect: false
-        max-attempts: 15
+        max-attempts: 30
         retry-delay: 30s
         retry-all: true
-      timeout-minutes: 10
+      timeout-minutes: 15
 
     - name: Terraform Destroy
       if: always()  # Run even on previous step failure
