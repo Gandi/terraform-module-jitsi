@@ -1,4 +1,4 @@
-# terraform-gandi-jitsi
+# terraform-module-jitsi
 
 Terraform module that installs a [Jitsi](https://meet.jit.si/) instance on a newly created
 OpenStack virtual machine on GandiCloud VPS infrastructure.
