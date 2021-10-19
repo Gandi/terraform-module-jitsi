@@ -31,6 +31,8 @@ jobs:
         shell: bash
         
     steps:
+    - name: Generate SSH Keypair name
+      run: echo TF_VAR_KEYPAIR_NAME=module-jitsi-test-$(uuidgen) >> $GITHUB_ENV
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
@@ -62,10 +64,10 @@ jobs:
       with:
         url: http://${{ secrets.DNS_SUBDOMAIN }}.${{ secrets.DNS_ZONE }}
         follow-redirect: false
-        max-attempts: 15
+        max-attempts: 30
         retry-delay: 30s
         retry-all: true
-      timeout-minutes: 10
+      timeout-minutes: 15
 
     - name: Terraform Destroy
       if: always()  # Run even on previous step failure
