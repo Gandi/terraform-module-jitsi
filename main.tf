@@ -40,7 +40,7 @@ resource "openstack_compute_instance_v2" "jitsi" {
 
   block_device {
     # Ubuntu 20.04
-    uuid                  = "47edd0a0-23ce-4ce5-9168-36de68990d1b"
+    uuid                  = "917f5a2b-df41-40e6-90bd-c7355a6791e4"
     source_type           = "image"
     volume_size           = 25
     boot_index            = 0
